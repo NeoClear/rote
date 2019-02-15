@@ -1,11 +1,11 @@
-use
+use rote::resolve::parser;
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn result() {
+    fn test_cmdtype() {
 
     }
 }
