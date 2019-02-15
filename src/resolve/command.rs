@@ -35,7 +35,13 @@ pub fn gist(filename: Vec<String>, sub_command: Vec<String>, description: Option
 }
 
 pub fn tag(filename: Vec<String>, sub_command: Vec<String>, description: Option<String>) -> Result<(), Box<dyn Error>> {
-
+    for sub in sub_command {
+        match sub {
+            _ if sub == "-list" => {
+            }
+            _ => (),
+        }
+    }
     Ok(())
 }
 
