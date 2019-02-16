@@ -1,8 +1,10 @@
 use std::error::Error;
 use chrono::prelude::*;
 use std::fs;
+use std::process;
 
 use crate::resolve::document;
+use crate::resolve::file;
 
 pub fn print(filename: Vec<String>, sub_command: Vec<String>, description: Option<String>) -> Result<(), Box<dyn Error>> {
     for file in filename {
@@ -38,7 +40,22 @@ pub fn tag(filename: Vec<String>, sub_command: Vec<String>, description: Option<
     for sub in sub_command {
         match sub {
             _ if sub == "-list" => {
+                let ans: Vec<file::FileList> = file::find_file("./".to_string())
+                                                    .into_iter()
+                                                    .filter(|s| s.filename.ends_with(".mk"))
+                                                    .collect();
+                for i in file::find_tag(ans) { println!("{}", i); }
             }
+            _ if sub == "-gen" => {
+                let ans: Vec<file::FileList> = file::find_file("./".to_string())
+                                                    .into_iter()
+                                                    .filter(|s| s.filename.ends_with(".mk"))
+                                                    .collect();
+                file::gen_rag(ans).unwrap_or_else(|err| {
+                    eprintln!("Error occurred: {}", err);
+                    process::exit(1);
+                });
+            },
             _ => (),
         }
     }
