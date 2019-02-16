@@ -3,3 +3,4 @@ Cargo.lock
 rote.iws
 rag
 tests/*.mk
+tests/*.md

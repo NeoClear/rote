@@ -42,14 +42,14 @@ pub fn tag(filename: Vec<String>, sub_command: Vec<String>, description: Option<
             _ if sub == "-list" => {
                 let ans: Vec<file::FileList> = file::find_file("./".to_string())
                                                     .into_iter()
-                                                    .filter(|s| s.filename.ends_with(".mk"))
+                                                    .filter(|s| s.filename.ends_with(".md"))
                                                     .collect();
                 for i in file::find_tag(ans) { println!("{}", i); }
             }
             _ if sub == "-gen" => {
                 let ans: Vec<file::FileList> = file::find_file("./".to_string())
                                                     .into_iter()
-                                                    .filter(|s| s.filename.ends_with(".mk"))
+                                                    .filter(|s| s.filename.ends_with(".md"))
                                                     .collect();
                 file::gen_rag(ans).unwrap_or_else(|err| {
                     eprintln!("Error occurred: {}", err);
