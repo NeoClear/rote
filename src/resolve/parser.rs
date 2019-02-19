@@ -26,7 +26,7 @@ pub struct Config {
     pub command: String,
     pub sub_command: Vec<String>,
     pub filename: Vec<String>,
-    pub description: Option<String>,
+    pub description: Vec<String>,
 }
 
 impl Config {
@@ -36,7 +36,7 @@ impl Config {
         let mut command: String;
         let mut sub_command: Vec<String> = Vec::new();
         let mut filename: Vec<String> = Vec::new();
-        let mut description: Option<String> = None;
+        let mut description: Vec<String> = Vec::new();
         let mut tmp: String;
 
         let mut flag = false;
@@ -65,9 +65,10 @@ impl Config {
                     break;
                 },
             };
+            tmp.retain(|c| {c != '\"'});
             match check_cmdtype(tmp.clone()) {
                 CommandType::File => filename.push(tmp),
-                CommandType::Description => description = Some(tmp),
+                CommandType::Description => description.push(tmp),
                 CommandType::SubSommand => sub_command.push(tmp),
             }
         }
