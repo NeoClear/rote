@@ -87,6 +87,13 @@ pub fn gen_rag(v: Vec<String>) -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-pub fn get_filename(tag: String) -> Vec<String> {
-    Vec::new()
+pub fn search(file: String, target: String) -> Vec<i64> {
+    let mut ans: Vec<i64> = Vec::new();
+    let content = fs::read_to_string(file).unwrap();
+    for (index, line) in content.lines().enumerate() {
+        if line.contains(&target) {
+            ans.push((index + 1) as i64);
+        }
+    }
+    ans
 }

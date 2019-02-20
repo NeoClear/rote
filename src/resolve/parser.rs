@@ -17,11 +17,12 @@ pub enum CommandType {
 pub fn check_cmdtype(s: String) -> CommandType {
     match s {
         _ if s.starts_with("-") => CommandType::SubSommand,
-        _ if s.starts_with("\"") && s.ends_with("\"") => CommandType::Description,
-        _ => CommandType::File,
+        _ if s.contains(".") => CommandType::File,
+        _ => CommandType::Description,
     }
 }
 
+#[derive(Debug)]
 pub struct Config {
     pub command: String,
     pub sub_command: Vec<String>,
@@ -65,7 +66,6 @@ impl Config {
                     break;
                 },
             };
-            tmp.retain(|c| {c != '\"'});
             match check_cmdtype(tmp.clone()) {
                 CommandType::File => filename.push(tmp),
                 CommandType::Description => description.push(tmp),
@@ -91,6 +91,7 @@ pub fn parser(conf: Config) -> Result<(), Box<dyn Error>> {
         _ if conf.command == "gen" => return command::gen(conf.filename, conf.sub_command, conf.description),
         _ if conf.command == "tag" => return command::tag(conf.filename, conf.sub_command, conf.description),
         _ if conf.command == "help" => return command::help(),
+        _ if conf.command == "search" => return command::search(conf.filename, conf.sub_command, conf.description),
         _ => (),
     }
     Ok(())

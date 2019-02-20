@@ -37,12 +37,12 @@ pub fn gist(filename: Vec<String>, sub_command: Vec<String>, description: Vec<St
 }
 
 pub fn tag(filename: Vec<String>, sub_command: Vec<String>, description: Vec<String>) -> Result<(), Box<dyn Error>> {
-    let mut hasFile = false;
-    let mut hasSub = false;
-    let mut hasDes = false;
+    let mut has_file = false;
+    let mut has_sub = false;
+    let mut has_des = false;
 
     for sub in sub_command {
-        hasSub = true;
+        has_sub = true;
         match sub {
             _ if sub == "-list" => {
                 let ans: Vec<String> = file::find_file("./".to_string())
@@ -66,25 +66,16 @@ pub fn tag(filename: Vec<String>, sub_command: Vec<String>, description: Vec<Str
             _ if sub == "-cache" => {
                 let rag = fs::read_to_string("./rag")?;
                 let mut flag = false;
-                let mut job = false;
                 for line in rag.lines() {
-                    if line.starts_with("@@") {
-//                        flag = !flag;
-                        for des in description {
-                            if line.clone().ends_with(des) {
-                                job = true;
-                                break;
-                            }
-                        }
+                    if line.starts_with("@@") && description.contains(&line[2..].to_string()) {
+                        flag = !flag;
+                        if flag { println!("{}: ", &line[2..].to_string()); }
+                        continue;
                     }
-                    if job {
-                        if !line.starts_with("@@") {
-                            println!("{}", line);
-                            continue;
-                        } else {
-                            job = false;
-                        }
+                    if flag {
+                        println!("{}", line);
                     }
+
                 }
                 return Ok(());
             },
@@ -92,8 +83,8 @@ pub fn tag(filename: Vec<String>, sub_command: Vec<String>, description: Vec<Str
         }
     }
 
-    if !hasSub {
-        hasFile = true;
+    if !has_sub && !filename.is_empty() {
+        has_file = true;
         let ans: Vec<String> = filename
             .into_iter()
             .filter(|s| s.ends_with(".md"))
@@ -101,11 +92,43 @@ pub fn tag(filename: Vec<String>, sub_command: Vec<String>, description: Vec<Str
         for i in file::find_tag(ans) { println!("{}", i); }
     }
 
-    if !hasFile {
-
+    if !has_file {
+        let ans: Vec<String> = file::find_file("./".to_string())
+                    .into_iter()
+                    .filter(|s| s.ends_with(".md"))
+                    .collect();
+                file::gen_rag(ans).unwrap_or_else(|err| {
+                    eprintln!("Error occurred: {}", err);
+                    process::exit(1);
+                });
+        let rag = fs::read_to_string("./rag")?;
+                let mut flag = false;
+                for line in rag.lines() {
+                    if line.starts_with("@@") && description.contains(&line[2..].to_string()) {
+                        flag = !flag;
+                        if flag { println!("{}: ", &line[2..].to_string()); }
+                        continue;
+                    }
+                    if flag {
+                        println!("{}", line);
+                    }
+                }
+        return Ok(());
     }
+    Ok(())
+}
 
-
+pub fn search(filename: Vec<String>, sub_command: Vec<String>, description: Vec<String>) -> Result<(), Box<dyn Error>> {
+    let ans: Vec<String> = file::find_file("./".to_string())
+        .into_iter()
+        .filter(|s| {s.ends_with(".md")})
+        .collect();
+    for des in description {
+        for f in ans.clone() {
+            let p = file::search(f.clone(), des.clone());
+            if !p.is_empty() { println!("{}: \n{:#?}", f.clone(), p); }
+        }
+    }
     Ok(())
 }
 
